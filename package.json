@@ -1,0 +1,20 @@
+{
+  "name": "gtown",
+  "lovefile": "game",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A daft pseudo-3D (2.5D) open-world driving toy built from real OpenStreetMap data, with Lua and LOVE2D",
+  "scripts": {
+    "setup": "npm install && node src/love2d4me/scripts/setup-love.js",
+    "lint": "node src/love2d4me/scripts/lint-vars.js src",
+    "start": "node src/love2d4me/scripts/start.js",
+    "dev": "node src/love2d4me/scripts/dev.js",
+    "pack": "node src/love2d4me/scripts/pack-love.js",
+    "build": "npm run pack && love.js game.love Web -t \"G-Town\" -c",
+    "serve": "npx --yes http-server Web -p 8080 -c-1"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.5.16",
+    "love.js": "^11.4.1"
+  }
+}

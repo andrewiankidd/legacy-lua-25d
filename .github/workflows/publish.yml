@@ -1,0 +1,24 @@
+name: Build and Deploy
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  ci:
+    uses: andrewiankidd/love2d4me/.github/workflows/love2d-ci.yml@master
+    with:
+      project_name: "G-Town"
+      love_filename: "game"
+      branch: "master"

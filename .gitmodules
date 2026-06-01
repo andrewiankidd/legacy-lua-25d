@@ -1,0 +1,3 @@
+[submodule "src/love2d4me"]
+	path = src/love2d4me
+	url = https://github.com/andrewiankidd/love2d4me.git
