@@ -9,7 +9,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
         #loadingCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        #canvas { position: absolute; top: 0; left: 0; transform-origin: 0 0; width: 100vw; height: 100vh; }
+        #canvas { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
         #fullscreen-btn {
             position: fixed; bottom: 8px; right: 8px; z-index: 100;
             background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.3);
@@ -31,15 +31,14 @@
         }
 
         function fitCanvas() {
-            // Stretch the canvas to fill the full viewport. Games render relative to
-            // love.graphics.getDimensions() so they adapt to the actual aspect instead
-            // of being letterboxed inside the conf'd internal resolution.
             var canvas = document.getElementById('canvas');
-            canvas.style.transform = 'none';
-            canvas.style.left = '0px';
-            canvas.style.top = '0px';
-            canvas.style.width = '100vw';
-            canvas.style.height = '100vh';
+            if (!canvas.width || !canvas.height) return;
+            var scaleX = window.innerWidth / canvas.width;
+            var scaleY = window.innerHeight / canvas.height;
+            var scale = Math.min(scaleX, scaleY);
+            canvas.style.transform = 'scale(' + scale + ')';
+            canvas.style.left = ((window.innerWidth - canvas.width * scale) / 2) + 'px';
+            canvas.style.top = ((window.innerHeight - canvas.height * scale) / 2) + 'px';
         }
         window.addEventListener('resize', fitCanvas);
 
