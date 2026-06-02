@@ -31,27 +31,15 @@
         }
 
         function fitCanvas() {
+            // Stretch the canvas to fill the full viewport. Games render relative to
+            // love.graphics.getDimensions() so they adapt to the actual aspect instead
+            // of being letterboxed inside the conf'd internal resolution.
             var canvas = document.getElementById('canvas');
-            var cw = canvas.width, ch = canvas.height;
-            if (!cw || !ch) {
-                // OffscreenCanvas transfer (pthread builds) makes width/height read as 0 on
-                // the main thread. Fall back to CSS-stretched fill so the worker output is
-                // visible at full viewport.
-                canvas.style.transform = 'none';
-                canvas.style.left = '0px';
-                canvas.style.top = '0px';
-                canvas.style.width = '100vw';
-                canvas.style.height = '100vh';
-                return;
-            }
-            var scaleX = window.innerWidth / cw;
-            var scaleY = window.innerHeight / ch;
-            var scale = Math.min(scaleX, scaleY);
-            canvas.style.width = cw + 'px';
-            canvas.style.height = ch + 'px';
-            canvas.style.transform = 'scale(' + scale + ')';
-            canvas.style.left = ((window.innerWidth - cw * scale) / 2) + 'px';
-            canvas.style.top = ((window.innerHeight - ch * scale) / 2) + 'px';
+            canvas.style.transform = 'none';
+            canvas.style.left = '0px';
+            canvas.style.top = '0px';
+            canvas.style.width = '100vw';
+            canvas.style.height = '100vh';
         }
         window.addEventListener('resize', fitCanvas);
 
