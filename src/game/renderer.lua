@@ -43,7 +43,7 @@ local function draw_road_segment(ax, ay, bx, by, w, col, project_fn, camera_spac
         flat[#flat + 1] = sy
     end
     love.graphics.setColor(col[1], col[2], col[3])
-    love.graphics.polygon("fill", flat)
+    pcall(love.graphics.polygon, "fill", flat)
 end
 
 local function draw_building(b, project_fn, camera_space_fn, cam_x, cam_y)
@@ -134,7 +134,7 @@ local function draw_vehicle(v, project_fn, camera_space_fn)
         flat[#flat + 1] = sy
     end
     love.graphics.setColor(v.color[1], v.color[2], v.color[3])
-    love.graphics.polygon("fill", flat)
+    pcall(love.graphics.polygon, "fill", flat)
 end
 
 local function draw_money(drop, project_fn)
@@ -154,9 +154,9 @@ local function draw_money(drop, project_fn)
     love.graphics.setColor(0, 0, 0, 0.35)
     love.graphics.ellipse("fill", sx, sy + size * 0.4, size * 0.5, size * 0.18)
     love.graphics.setColor(0.25, 0.85, 0.35, 1)
-    love.graphics.polygon("fill", pts)
+    pcall(love.graphics.polygon, "fill", pts)
     love.graphics.setColor(0.05, 0.4, 0.1, 1)
-    love.graphics.polygon("line", pts)
+    pcall(love.graphics.polygon, "line", pts)
     love.graphics.setColor(1, 1, 1, 1)
 end
 

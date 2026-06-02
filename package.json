@@ -10,7 +10,7 @@
     "start": "node src/love2d4me/scripts/start.js",
     "dev": "node src/love2d4me/scripts/dev.js",
     "pack": "node src/love2d4me/scripts/pack-love.js",
-    "build": "npm run pack && love.js game.love Web -t \"G-Town\" -c",
+    "build": "npm run pack && love.js game.love Web -t \"G-Town\" -c && node src/love2d4me/scripts/patch-web.js",
     "serve": "npx --yes http-server Web -p 8080 -c-1"
   },
   "devDependencies": {
