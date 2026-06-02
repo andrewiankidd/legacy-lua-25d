@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <title>G-Town</title>
+    <title>{{title}}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
@@ -59,8 +59,8 @@
         }, false);
 
         var Module = {
-            arguments: ["./game.love"],
-            INITIAL_MEMORY: 16777216,
+            arguments: {{{arguments}}},
+            INITIAL_MEMORY: {{memory}},
             printErr: console.error.bind(console),
             canvas: (function() {
                 var canvas = document.getElementById('canvas');
