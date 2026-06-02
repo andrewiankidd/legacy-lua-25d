@@ -21,6 +21,7 @@
 
     <script>
     Object.defineProperty(window, 'devicePixelRatio', {value: 1, writable: false});
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.getRegistrations().then(function(r) { r.forEach(function(w) { w.unregister(); }); }); }
     // Block resize events from reaching love.js — it re-renders at wrong coords
     window.addEventListener('resize', function(e) { e.stopImmediatePropagation(); }, true);
     (function() {
