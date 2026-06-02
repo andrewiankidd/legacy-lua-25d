@@ -6,18 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, minimum-scale=1, maximum-scale=1">
     <title>{{title}}</title>
     <style>
-      * { box-sizing: border-box; }
-      body { margin: 0; overflow: hidden; background: #000; }
-      h1, footer { display: none; }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center; }
+      #loadingCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; }
+      #game-wrap { transform-origin: center center; }
       #canvas { display: block; border: 0; padding: 0; visibility: hidden; }
     </style>
   </head>
   <body>
-    <canvas id="loadingCanvas" oncontextmenu="event.preventDefault()" width="{{width}}" height="{{height}}"></canvas>
-    <canvas id="canvas" oncontextmenu="event.preventDefault()" width="{{width}}" height="{{height}}"></canvas>
+    <canvas id="loadingCanvas" oncontextmenu="event.preventDefault()" width="800" height="600"></canvas>
+    <div id="game-wrap">
+      <canvas id="canvas" oncontextmenu="event.preventDefault()" width="{{width}}" height="{{height}}"></canvas>
+    </div>
 
     <script>
     Object.defineProperty(window, 'devicePixelRatio', {value: 1, writable: false});
+    // Block resize events from reaching love.js — it re-renders at wrong coords
+    window.addEventListener('resize', function(e) { e.stopImmediatePropagation(); }, true);
     (function() {
         var W = {{width}}, H = {{height}};
         var c = document.getElementById('canvas');
@@ -35,13 +40,8 @@
     </script>
     <script type='text/javascript'>
       function goFullScreen(){
-            var canvas = document.getElementById("canvas");
-            if(canvas.requestFullScreen)
-                canvas.requestFullScreen();
-            else if(canvas.webkitRequestFullScreen)
-                canvas.webkitRequestFullScreen();
-            else if(canvas.mozRequestFullScreen)
-                canvas.mozRequestFullScreen();
+            var el = document.documentElement;
+            (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || function(){}).call(el);
       }
       function FullScreenHook(){}
       var loadingContext = document.getElementById('loadingCanvas').getContext('2d');
@@ -109,20 +109,12 @@
     <script>
     (function() {
         var W = {{width}}, H = {{height}};
+        var wrap = document.getElementById('game-wrap');
         function fitCanvas() {
-            var c = document.getElementById('canvas');
-            if (!c || c.style.visibility === 'hidden') return;
-            var sx = window.innerWidth / W;
-            var sy = window.innerHeight / H;
-            var s = Math.min(sx, sy);
-            c.style.position = 'fixed';
-            c.style.transformOrigin = '0 0';
-            c.style.transform = 'scale(' + s + ')';
-            c.style.left = Math.round((window.innerWidth - W * s) / 2) + 'px';
-            c.style.top = Math.round((window.innerHeight - H * s) / 2) + 'px';
+            var s = Math.min(window.innerWidth / W, window.innerHeight / H);
+            wrap.style.transform = 'scale(' + s + ')';
         }
-        window.addEventListener('resize', fitCanvas);
-        setInterval(fitCanvas, 200);
+        setInterval(fitCanvas, 100);
     })();
     </script>
   </body>
