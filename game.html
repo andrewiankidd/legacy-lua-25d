@@ -1,103 +1,129 @@
 <!doctype html>
 <html lang="en-us">
-<head>
+  <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, minimum-scale=1, maximum-scale=1">
     <title>{{title}}</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
-        #loadingCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        #canvas { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
-        #fullscreen-btn {
-            position: fixed; bottom: 8px; right: 8px; z-index: 100;
-            background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 4px; padding: 4px 10px; font-size: 12px; cursor: pointer;
-            opacity: 0.6; transition: opacity 0.2s;
-        }
-        #fullscreen-btn:hover { opacity: 1; }
+      * { box-sizing: border-box; }
+      body { margin: 0; overflow: hidden; background: #000; }
+      h1, footer { display: none; }
+      #canvas { display: block; border: 0; padding: 0; visibility: hidden; }
     </style>
-</head>
-<body>
-    <canvas id="loadingCanvas" oncontextmenu="event.preventDefault()" width="800" height="600"></canvas>
-    <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-    <button id="fullscreen-btn" onclick="goFullScreen()">Fullscreen</button>
+  </head>
+  <body>
+    <canvas id="loadingCanvas" oncontextmenu="event.preventDefault()" width="{{width}}" height="{{height}}"></canvas>
+    <canvas id="canvas" oncontextmenu="event.preventDefault()" width="{{width}}" height="{{height}}"></canvas>
 
     <script>
-        function goFullScreen() {
-            var el = document.documentElement;
-            (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || function(){}).call(el);
-        }
+    Object.defineProperty(window, 'devicePixelRatio', {value: 1, writable: false});
+    (function() {
+        var W = {{width}}, H = {{height}};
+        var c = document.getElementById('canvas');
+        Object.defineProperty(c, 'width', {
+            get: function() { return W; },
+            set: function() {},
+            configurable: true
+        });
+        Object.defineProperty(c, 'height', {
+            get: function() { return H; },
+            set: function() {},
+            configurable: true
+        });
+    })();
+    </script>
+    <script type='text/javascript'>
+      function goFullScreen(){
+            var canvas = document.getElementById("canvas");
+            if(canvas.requestFullScreen)
+                canvas.requestFullScreen();
+            else if(canvas.webkitRequestFullScreen)
+                canvas.webkitRequestFullScreen();
+            else if(canvas.mozRequestFullScreen)
+                canvas.mozRequestFullScreen();
+      }
+      function FullScreenHook(){}
+      var loadingContext = document.getElementById('loadingCanvas').getContext('2d');
+      function drawLoadingText(text) {
+        var canvas = loadingContext.canvas;
+        loadingContext.fillStyle = "rgb(142, 195, 227)";
+        loadingContext.fillRect(0, 0, canvas.scrollWidth, canvas.scrollHeight);
+        loadingContext.font = '2em arial';
+        loadingContext.textAlign = 'center'
+        loadingContext.fillStyle = "rgb( 11, 86, 117 )";
+        loadingContext.fillText(text, canvas.scrollWidth / 2, canvas.scrollHeight / 2);
+        loadingContext.fillText("Powered By Emscripten.", canvas.scrollWidth / 2, canvas.scrollHeight / 4);
+        loadingContext.fillText("Powered By LOVE.", canvas.scrollWidth / 2, canvas.scrollHeight / 4 * 3);
+      }
 
+      window.onload = function () { window.focus(); };
+      window.onclick = function () { window.focus(); };
+
+      window.addEventListener("keydown", function(e) {
+        if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+          e.preventDefault();
+        }
+      }, false);
+
+      var Module = {
+        arguments: ["./game.love"],
+        INITIAL_MEMORY: {{memory}},
+        printErr: console.error.bind(console),
+        canvas: (function() {
+          var canvas = document.getElementById('canvas');
+          canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+          return canvas;
+        })(),
+        setStatus: function(text) {
+          if (text) {
+            drawLoadingText(text);
+          } else if (Module.remainingDependencies === 0) {
+            document.getElementById('loadingCanvas').style.display = 'none';
+            document.getElementById('canvas').style.visibility = 'visible';
+          }
+        },
+        totalDependencies: 0,
+        remainingDependencies: 0,
+        monitorRunDependencies: function(left) {
+          this.remainingDependencies = left;
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        }
+      };
+      Module.setStatus('Downloading...');
+      window.onerror = function(event) {
+        Module.setStatus('Exception thrown, see JavaScript console');
+        Module.setStatus = function(text) {
+          if (text) Module.printErr('[post-exception status] ' + text);
+        };
+      };
+
+      var applicationLoad = function(e) {
+        Love(Module);
+      }
+    </script>
+    <script type="text/javascript" src="game.js"></script>
+    <script async type="text/javascript" src="love.js" onload="applicationLoad(this)"></script>
+
+    <script>
+    (function() {
+        var W = {{width}}, H = {{height}};
         function fitCanvas() {
-            var canvas = document.getElementById('canvas');
-            if (!canvas.width || !canvas.height) return;
-            var scaleX = window.innerWidth / canvas.width;
-            var scaleY = window.innerHeight / canvas.height;
-            var scale = Math.min(scaleX, scaleY);
-            canvas.style.transform = 'scale(' + scale + ')';
-            canvas.style.left = ((window.innerWidth - canvas.width * scale) / 2) + 'px';
-            canvas.style.top = ((window.innerHeight - canvas.height * scale) / 2) + 'px';
+            var c = document.getElementById('canvas');
+            if (!c || c.style.visibility === 'hidden') return;
+            var sx = window.innerWidth / W;
+            var sy = window.innerHeight / H;
+            var s = Math.min(sx, sy);
+            c.style.position = 'fixed';
+            c.style.transformOrigin = '0 0';
+            c.style.transform = 'scale(' + s + ')';
+            c.style.left = Math.round((window.innerWidth - W * s) / 2) + 'px';
+            c.style.top = Math.round((window.innerHeight - H * s) / 2) + 'px';
         }
         window.addEventListener('resize', fitCanvas);
-
-        var loadingContext = document.getElementById('loadingCanvas').getContext('2d');
-        function drawLoadingText(text) {
-            var c = loadingContext.canvas;
-            loadingContext.fillStyle = '#000';
-            loadingContext.fillRect(0, 0, c.width, c.height);
-            loadingContext.font = '1.5em sans-serif';
-            loadingContext.textAlign = 'center';
-            loadingContext.fillStyle = '#888';
-            loadingContext.fillText(text, c.width / 2, c.height / 2);
-        }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(regs) {
-                regs.forEach(function(reg) { reg.unregister(); });
-            });
-        }
-
-        window.onload = function() { window.focus(); };
-        window.onclick = function() { window.focus(); };
-        window.addEventListener('keydown', function(e) {
-            if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) e.preventDefault();
-        }, false);
-
-        var Module = {
-            arguments: {{{arguments}}},
-            INITIAL_MEMORY: {{memory}},
-            printErr: console.error.bind(console),
-            canvas: (function() {
-                var canvas = document.getElementById('canvas');
-                canvas.addEventListener('webglcontextlost', function(e) {
-                    alert('WebGL context lost. Reload the page.'); e.preventDefault();
-                }, false);
-                return canvas;
-            })(),
-            setStatus: function(text) {
-                if (text) {
-                    drawLoadingText(text);
-                } else if (Module.remainingDependencies === 0) {
-                    document.getElementById('loadingCanvas').style.display = 'none';
-                    fitCanvas();
-                }
-            },
-            totalDependencies: 0,
-            remainingDependencies: 0,
-            monitorRunDependencies: function(left) {
-                this.remainingDependencies = left;
-                this.totalDependencies = Math.max(this.totalDependencies, left);
-                Module.setStatus(left ? 'Loading (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : '');
-            }
-        };
-        Module.setStatus('Loading...');
-        window.onerror = function() {
-            Module.setStatus('Error - see console');
-        };
-        var applicationLoad = function() { Love(Module); };
+        setInterval(fitCanvas, 200);
+    })();
     </script>
-    <script src="game.js"></script>
-    <script async src="love.js" onload="applicationLoad()"></script>
-</body>
+  </body>
 </html>
