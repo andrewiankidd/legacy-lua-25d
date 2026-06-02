@@ -99,9 +99,16 @@ local function draw_building(b, project_fn, camera_space_fn, cam_x, cam_y)
         end
     end
     if valid_roof and #flat >= 6 then
+        -- Defensive: love.math.triangulate can fail on degenerate projected polygons
+        -- (collinear/self-intersecting near-edge cases) and under love.js pthread builds
+        -- has been observed to return values that crash the iteration loop.
         local ok, tris = pcall(love.math.triangulate, flat)
-        if ok then
-            for _, tri in ipairs(tris) do love.graphics.polygon("fill", tri) end
+        if ok and type(tris) == "table" then
+            for _, tri in ipairs(tris) do
+                if type(tri) == "table" and #tri >= 6 then
+                    pcall(love.graphics.polygon, "fill", tri)
+                end
+            end
         end
     end
 end
