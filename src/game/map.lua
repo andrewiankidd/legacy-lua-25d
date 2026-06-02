@@ -152,8 +152,8 @@ function Map.load(opts)
         local min_d = math.huge
         for _, pt in ipairs(path) do
             local dx, dy = pt.x - spawn_x, pt.y - spawn_y
-            local d = dx * dx + dy * dy
-            if d < min_d then min_d = d end
+            local dist_sq = dx * dx + dy * dy
+            if dist_sq < min_d then min_d = dist_sq end
         end
         return min_d
     end
@@ -219,8 +219,8 @@ function Map.load(opts)
         local min_d = math.huge
         for _, pt in ipairs(path) do
             local dx, dy = pt.x - spawn_x, pt.y - spawn_y
-            local d = dx * dx + dy * dy
-            if d < min_d then min_d = d end
+            local dist_sq = dx * dx + dy * dy
+            if dist_sq < min_d then min_d = dist_sq end
         end
         return min_d
     end
