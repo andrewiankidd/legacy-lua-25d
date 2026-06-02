@@ -9,7 +9,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
         #loadingCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        #canvas { position: absolute; top: 0; left: 0; visibility: hidden; transform-origin: 0 0; }
+        #canvas { position: absolute; top: 0; left: 0; visibility: hidden; transform-origin: 0 0; width: 100vw; height: 100vh; }
         #fullscreen-btn {
             position: fixed; bottom: 8px; right: 8px; z-index: 100;
             background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.3);
@@ -32,13 +32,26 @@
 
         function fitCanvas() {
             var canvas = document.getElementById('canvas');
-            if (!canvas.width || !canvas.height) return;
-            var scaleX = window.innerWidth / canvas.width;
-            var scaleY = window.innerHeight / canvas.height;
+            var cw = canvas.width, ch = canvas.height;
+            if (!cw || !ch) {
+                // OffscreenCanvas transfer (pthread builds) makes width/height read as 0 on
+                // the main thread. Fall back to CSS-stretched fill so the worker output is
+                // visible at full viewport.
+                canvas.style.transform = 'none';
+                canvas.style.left = '0px';
+                canvas.style.top = '0px';
+                canvas.style.width = '100vw';
+                canvas.style.height = '100vh';
+                return;
+            }
+            var scaleX = window.innerWidth / cw;
+            var scaleY = window.innerHeight / ch;
             var scale = Math.min(scaleX, scaleY);
+            canvas.style.width = cw + 'px';
+            canvas.style.height = ch + 'px';
             canvas.style.transform = 'scale(' + scale + ')';
-            canvas.style.left = ((window.innerWidth - canvas.width * scale) / 2) + 'px';
-            canvas.style.top = ((window.innerHeight - canvas.height * scale) / 2) + 'px';
+            canvas.style.left = ((window.innerWidth - cw * scale) / 2) + 'px';
+            canvas.style.top = ((window.innerHeight - ch * scale) / 2) + 'px';
         }
         window.addEventListener('resize', fitCanvas);
 
