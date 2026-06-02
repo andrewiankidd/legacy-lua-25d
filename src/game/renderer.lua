@@ -130,7 +130,30 @@ local function draw_vehicle(v, project_fn, camera_space_fn)
     love.graphics.polygon("fill", flat)
 end
 
-function Renderer.draw(data, cam, player, driving, pedestrians)
+local function draw_money(drop, project_fn)
+    local sx, sy, fwd = project_fn(drop.x, drop.y, 0.3)
+    if not sx or fwd <= 0.5 then return end
+    local scale = math.max(0.4, 400 / fwd * 0.05)
+    local size = 10 * scale
+    local cosr, sinr = math.cos(drop.rot), math.sin(drop.rot)
+    local hw = size / 2
+    local hh = size / 3
+    local pts = {
+        sx + cosr * -hw - sinr * -hh, sy + sinr * -hw + cosr * -hh,
+        sx + cosr *  hw - sinr * -hh, sy + sinr *  hw + cosr * -hh,
+        sx + cosr *  hw - sinr *  hh, sy + sinr *  hw + cosr *  hh,
+        sx + cosr * -hw - sinr *  hh, sy + sinr * -hw + cosr *  hh,
+    }
+    love.graphics.setColor(0, 0, 0, 0.35)
+    love.graphics.ellipse("fill", sx, sy + size * 0.4, size * 0.5, size * 0.18)
+    love.graphics.setColor(0.25, 0.85, 0.35, 1)
+    love.graphics.polygon("fill", pts)
+    love.graphics.setColor(0.05, 0.4, 0.1, 1)
+    love.graphics.polygon("line", pts)
+    love.graphics.setColor(1, 1, 1, 1)
+end
+
+function Renderer.draw(data, cam, player, driving, pedestrians, money_drops)
     local sw, sh = love.graphics.getDimensions()
     local horizon = sh * cam.horizon_frac
     local project_fn = function(wx, wy, wz) return cam:project(wx, wy, wz) end
@@ -204,6 +227,13 @@ function Renderer.draw(data, cam, player, driving, pedestrians)
                     love.graphics.setColor(1, 1, 1, 1)
                 end
             end
+        end
+    end
+
+    -- Money drops: rotating green rectangles hovering above the ground
+    if money_drops then
+        for _, drop in ipairs(money_drops) do
+            draw_money(drop, project_fn)
         end
     end
 

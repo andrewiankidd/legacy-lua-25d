@@ -19,8 +19,18 @@ local data
 local oblique_cam = nil
 local player = nil
 local pedestrians = {}
+local money_drops = {}
 Map.road_paths = {}
 Map.pedestrians = pedestrians
+Map.money_drops = money_drops
+
+local MONEY_PICKUP_RADIUS = 1.6
+local MONEY_VALUE = 10
+local MONEY_LIFETIME = 30
+
+function Map.drop_money(world_x, world_y)
+    money_drops[#money_drops + 1] = { x = world_x, y = world_y, rot = 0, t = 0 }
+end
 
 local FOCAL = 400
 local CAM_HEIGHT = 9
@@ -55,7 +65,10 @@ function Map.load(opts)
         anim = newAnimation(love.graphics.newImage(PLAYER_SPRITE), PLAYER_FRAME, PLAYER_FRAME, 0.1, 0),
         frame = PLAYER_FRAME, walk = { 25, 30 },
         hp = 100, max_hp = 100,
+        money = 0,
     }
+    money_drops = {}
+    Map.money_drops = money_drops
     player.anim:seek(player.walk[1])
     data = require("game.maps.city.data")
 
@@ -312,12 +325,52 @@ function Map.update(dt)
                         ped.max_hp = ped.max_hp or 30
                         ped.hit_flash = 0.15
                         NPC.aggro(ped, 10)
-                        if ped.hp <= 0 then ped.alive = false end
+                        if ped.hp <= 0 then
+                            ped.alive = false
+                            Map.drop_money(ped.x, ped.y)
+                        end
                     end
                 end
             end
         end
     end
+
+    -- Car runs over pedestrians: any ped inside the vehicle's footprint dies instantly
+    local Vlib = require("love2d4me").vehicle
+    local driving = Vlib.get_current()
+    if driving then
+        local ca, sa = math.cos(driving.angle), math.sin(driving.angle)
+        local fwd_x, fwd_y = -sa, ca
+        local right_x, right_y = ca, sa
+        local hl, hw = driving.h / 2, driving.w / 2
+        for _, ped in ipairs(pedestrians) do
+            if ped.alive ~= false then
+                local rx, ry = ped.x - driving.x, ped.y - driving.y
+                local along = rx * fwd_x + ry * fwd_y
+                local across = rx * right_x + ry * right_y
+                if math.abs(along) <= hl and math.abs(across) <= hw then
+                    ped.alive = false
+                    Map.drop_money(ped.x, ped.y)
+                end
+            end
+        end
+    end
+
+    -- Money drops: rotate, age out, get picked up
+    for i = #money_drops, 1, -1 do
+        local drop = money_drops[i]
+        drop.rot = drop.rot + dt * 3
+        drop.t = drop.t + dt
+        local dx = drop.x - player_wx
+        local dy = drop.y - player_wy
+        if dx * dx + dy * dy < MONEY_PICKUP_RADIUS * MONEY_PICKUP_RADIUS then
+            player.money = (player.money or 0) + MONEY_VALUE
+            table.remove(money_drops, i)
+        elseif drop.t > MONEY_LIFETIME then
+            table.remove(money_drops, i)
+        end
+    end
+    HUD.set_money(player.money)
 
     -- Aggro'd pedestrians damage player on proximity
     for _, ped in ipairs(pedestrians) do
@@ -433,7 +486,7 @@ function Map.update(dt)
 end
 
 function Map.draw()
-    Renderer.draw(data, oblique_cam, player, Vehicle.get_current(), pedestrians)
+    Renderer.draw(data, oblique_cam, player, Vehicle.get_current(), pedestrians, money_drops)
     HUD.draw()
 end
 
