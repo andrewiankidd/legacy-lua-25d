@@ -356,14 +356,15 @@ function Map.update(dt)
         end
     end
 
-    -- Money drops: rotate, age out, get picked up
+    -- Money drops: rotate, age out, get picked up (only on foot)
     for i = #money_drops, 1, -1 do
         local drop = money_drops[i]
         drop.rot = drop.rot + dt * 3
         drop.t = drop.t + dt
         local dx = drop.x - player_wx
         local dy = drop.y - player_wy
-        if dx * dx + dy * dy < MONEY_PICKUP_RADIUS * MONEY_PICKUP_RADIUS then
+        local in_range = dx * dx + dy * dy < MONEY_PICKUP_RADIUS * MONEY_PICKUP_RADIUS
+        if in_range and not driving then
             player.money = (player.money or 0) + MONEY_VALUE
             table.remove(money_drops, i)
         elseif drop.t > MONEY_LIFETIME then
