@@ -88,7 +88,9 @@ function Movement.update(dt, cam, player, data)
                 end
             end
         else
-            local ok, exit_x, exit_y = Vehicle.exit(ppx, ppy, cam.angle)
+            local ok, exit_x, exit_y = Vehicle.exit(ppx, ppy, cam.angle, function(qx, qy)
+                return blocked(qx, qy, data)
+            end)
             if ok and exit_x then
                 cam.x = exit_x - fx * pivot
                 cam.y = exit_y - fy * pivot
