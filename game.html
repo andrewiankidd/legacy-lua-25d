@@ -7,10 +7,10 @@
     <title>{{title}}</title>
     <style>
       * { box-sizing: border-box; }
-      body { margin: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; }
+      body { margin: 0; overflow: hidden; background: #000; }
       h1, footer { display: none; }
-      #loadingCanvas { position: absolute; }
-      #canvas { display: block; border: 0; padding: 0; }
+      #loadingCanvas { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+      #canvas { display: block; border: 0; padding: 0; position: absolute; top: 50%; left: 50%; transform-origin: 0 0; }
     </style>
   </head>
   <body>
@@ -95,5 +95,18 @@
     </script>
     <script type="text/javascript" src="game.js"></script>
     <script async type="text/javascript" src="love.js" onload="applicationLoad(this)"></script>
+
+    <script>
+    (function() {
+        function fitCanvas() {
+            var c = document.getElementById('canvas');
+            if (!c || !c.width || !c.height) return;
+            var s = Math.min(window.innerWidth / c.width, window.innerHeight / c.height);
+            c.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+        }
+        window.addEventListener('resize', fitCanvas);
+        setInterval(fitCanvas, 200);
+    })();
+    </script>
   </body>
 </html>
