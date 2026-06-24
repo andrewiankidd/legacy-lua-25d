@@ -1,6 +1,6 @@
 {
   "name": "gtown",
-  "lovefile": "game",
+  "lovefile": "gtown",
   "version": "0.1.0",
   "private": true,
   "description": "A daft pseudo-3D (2.5D) open-world driving toy built from real OpenStreetMap data, with Lua and LOVE2D",

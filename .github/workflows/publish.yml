@@ -20,5 +20,5 @@ jobs:
     uses: andrewiankidd/love2d4me/.github/workflows/love2d-ci.yml@master
     with:
       project_name: "G-Town"
-      love_filename: "game"
+      love_filename: "gtown"
       branch: "master"
