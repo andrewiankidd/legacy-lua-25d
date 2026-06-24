@@ -19,16 +19,17 @@
     <script>
     Object.defineProperty(window, 'devicePixelRatio', {value: 1, writable: false});
     (function() {
-        var W = 1440, H = 900;
+        window._canvasW = 1440;
+        window._canvasH = 900;
         var c = document.getElementById('canvas');
         Object.defineProperty(c, 'width', {
-            get: function() { return W; },
-            set: function() {},
+            get: function() { return window._canvasW; },
+            set: function(v) { if (v > 0) window._canvasW = v; },
             configurable: true
         });
         Object.defineProperty(c, 'height', {
-            get: function() { return H; },
-            set: function() {},
+            get: function() { return window._canvasH; },
+            set: function(v) { if (v > 0) window._canvasH = v; },
             configurable: true
         });
     })();
@@ -114,10 +115,10 @@
 
     <script>
     (function() {
-        var W = 1440, H = 900;
         function fitCanvas() {
             var c = document.getElementById('canvas');
             if (!c || c.style.visibility === 'hidden') return;
+            var W = window._canvasW, H = window._canvasH;
             var sx = window.innerWidth / W;
             var sy = window.innerHeight / H;
             var s = Math.min(sx, sy);
