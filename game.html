@@ -7,15 +7,16 @@
     <title>{{title}}</title>
     <style>
       * { box-sizing: border-box; }
-      body { margin: 0; overflow: hidden; background: #000; }
+      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
       h1, footer { display: none; }
       #loadingCanvas { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-      #canvas { display: block; border: 0; padding: 0; position: absolute; top: 50%; left: 50%; transform-origin: 0 0; }
+      #canvas-wrap { position: absolute; transform-origin: top left; visibility: hidden; }
+      #canvas { display: block; border: 0; padding: 0; }
     </style>
   </head>
   <body>
     <canvas id="loadingCanvas" oncontextmenu="event.preventDefault()" width="800" height="600"></canvas>
-    <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    <div id="canvas-wrap"><canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas></div>
 
     <script type='text/javascript'>
       function goFullScreen(){
@@ -98,14 +99,37 @@
 
     <script>
     (function() {
+        var lastW = 0, lastH = 0, lastVW = 0, lastVH = 0;
         function fitCanvas() {
             var c = document.getElementById('canvas');
-            if (!c || !c.width || !c.height) return;
-            var s = Math.min(window.innerWidth / c.width, window.innerHeight / c.height);
-            c.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+            var w = document.getElementById('canvas-wrap');
+            if (!c || !w) return requestAnimationFrame(fitCanvas);
+
+            // Skip HTML default 300x150 — love.js hasn't touched the canvas yet
+            if (c.width === 300 && c.height === 150) {
+                requestAnimationFrame(fitCanvas);
+                return;
+            }
+
+            // love.js starts tiny (2x2 or 3x3) with resizable — kick it
+            if (c.width <= 16 || c.height <= 16) {
+                window.dispatchEvent(new Event('resize'));
+                requestAnimationFrame(fitCanvas);
+                return;
+            }
+
+            var vw = window.innerWidth, vh = window.innerHeight;
+            if (c.width !== lastW || c.height !== lastH || vw !== lastVW || vh !== lastVH) {
+                lastW = c.width; lastH = c.height; lastVW = vw; lastVH = vh;
+                var s = Math.min(vw / c.width, vh / c.height);
+                w.style.left = Math.round((vw - c.width * s) / 2) + 'px';
+                w.style.top = Math.round((vh - c.height * s) / 2) + 'px';
+                w.style.transform = 'scale(' + s + ')';
+                w.style.visibility = 'visible';
+            }
+            requestAnimationFrame(fitCanvas);
         }
-        window.addEventListener('resize', fitCanvas);
-        setInterval(fitCanvas, 200);
+        requestAnimationFrame(fitCanvas);
     })();
     </script>
   </body>
