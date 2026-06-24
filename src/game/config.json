@@ -3,5 +3,22 @@
     "width": 1440,
     "height": 900,
     "play_label": "Play",
-    "menu_logo": "game/pictures/icon.png"
+    "default_skin": "clean",
+    "platform_skins": {
+        "desktop": "clean",
+        "mobile": "gbc"
+    },
+    "orientation_skins": {
+        "portrait": "gbc",
+        "landscape": "gba"
+    },
+    "menu_logo": "game/pictures/icon.png",
+    "credits": [
+        "G-Town",
+        "",
+        "A Tilted Cartridge game",
+        "",
+        "Built with love2d4me",
+        "Powered by LÖVE (love2d.org)"
+    ]
 }
