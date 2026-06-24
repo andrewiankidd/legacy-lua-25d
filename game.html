@@ -7,33 +7,16 @@
     <title>{{title}}</title>
     <style>
       * { box-sizing: border-box; }
-      body { margin: 0; overflow: hidden; background: #000; }
+      body { margin: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; }
       h1, footer { display: none; }
-      #canvas { display: block; border: 0; padding: 0; visibility: hidden; }
+      #loadingCanvas { position: absolute; }
+      #canvas { display: block; border: 0; padding: 0; }
     </style>
   </head>
   <body>
-    <canvas id="loadingCanvas" oncontextmenu="event.preventDefault()" width="{{width}}" height="{{height}}"></canvas>
-    <canvas id="canvas" oncontextmenu="event.preventDefault()" width="{{width}}" height="{{height}}"></canvas>
+    <canvas id="loadingCanvas" oncontextmenu="event.preventDefault()" width="800" height="600"></canvas>
+    <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
 
-    <script>
-    Object.defineProperty(window, 'devicePixelRatio', {value: 1, writable: false});
-    (function() {
-        window._canvasW = {{width}};
-        window._canvasH = {{height}};
-        var c = document.getElementById('canvas');
-        Object.defineProperty(c, 'width', {
-            get: function() { return window._canvasW; },
-            set: function(v) { if (v > 0) window._canvasW = v; },
-            configurable: true
-        });
-        Object.defineProperty(c, 'height', {
-            get: function() { return window._canvasH; },
-            set: function(v) { if (v > 0) window._canvasH = v; },
-            configurable: true
-        });
-    })();
-    </script>
     <script type='text/javascript'>
       function goFullScreen(){
             var canvas = document.getElementById("canvas");
@@ -112,25 +95,5 @@
     </script>
     <script type="text/javascript" src="game.js"></script>
     <script async type="text/javascript" src="love.js" onload="applicationLoad(this)"></script>
-
-    <script>
-    (function() {
-        function fitCanvas() {
-            var c = document.getElementById('canvas');
-            if (!c || c.style.visibility === 'hidden') return;
-            var W = window._canvasW, H = window._canvasH;
-            var sx = window.innerWidth / W;
-            var sy = window.innerHeight / H;
-            var s = Math.min(sx, sy);
-            c.style.position = 'fixed';
-            c.style.transformOrigin = '0 0';
-            c.style.transform = 'scale(' + s + ')';
-            c.style.left = Math.round((window.innerWidth - W * s) / 2) + 'px';
-            c.style.top = Math.round((window.innerHeight - H * s) / 2) + 'px';
-        }
-        window.addEventListener('resize', fitCanvas);
-        setInterval(fitCanvas, 200);
-    })();
-    </script>
   </body>
 </html>
