@@ -3,6 +3,16 @@
     "width": 1440,
     "height": 900,
     "play_label": "Play",
+    "actions": {
+        "move_up":    { "keys": ["up", "w"] },
+        "move_down":  { "keys": ["down", "s"] },
+        "move_left":  { "keys": ["left", "a"] },
+        "move_right": { "keys": ["right", "d"] },
+        "sprint":     { "keys": ["lshift", "rshift"] },
+        "interact":   { "keys": ["e", "return"] },
+        "attack":     { "keys": ["f", "space"], "label": "Attack" },
+        "skin_cycle": { "keys": ["home"] }
+    },
     "default_skin": "clean",
     "platform_skins": {
         "desktop": "clean",

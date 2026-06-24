@@ -46,8 +46,6 @@ function Map.load(opts)
         x = 0, y = 0, angle = 0, height = CAM_HEIGHT,
         focal = FOCAL, horizon = HORIZON_FRAC, near = 3, anchor = 0.84,
     })
-    Input.init()
-    Input.bind("attack", { keys = {"f", "space"} })
 
     HUD.set_controls({
         "W/S: Move",
