@@ -66,8 +66,14 @@
         }
       }, false);
 
+      var _args = ["./game.love"];
+      (function() {
+        var params = new URLSearchParams(window.location.search);
+        var skin = params.get('skin');
+        if (skin) _args.push('--skin', skin.replace(/[^a-zA-Z0-9_-]/g, ''));
+      })();
       var Module = {
-        arguments: ["./game.love"],
+        arguments: _args,
         INITIAL_MEMORY: 16777216,
         printErr: console.error.bind(console),
         canvas: (function() {

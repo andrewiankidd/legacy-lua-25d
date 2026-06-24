@@ -112,8 +112,7 @@
         <nav>
             <a href="javascript:toggleLightMode();">&#127767;</a>
             <a id="nav-source" href="#">Source</a>
-            <a href="changelog.html">Changelog</a>
-            <a href="docs.html">Docs</a>
+            <a id="nav-changelog" href="#">Changelog</a>
         </nav>
     </header>
 
@@ -171,6 +170,9 @@
             // Header
             document.getElementById("header-title").textContent = site.title;
             document.getElementById("nav-source").href = site.source;
+            if (site.repo) {
+                document.getElementById("nav-changelog").href = "https://github.com/" + site.repo + "/blob/HEAD/CHANGELOG.md";
+            }
 
             // Hero
             document.getElementById("hero-logo").alt = site.title + " icon";
